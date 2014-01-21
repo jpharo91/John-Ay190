@@ -1,0 +1,131 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Load some basic packages that are useful to have
+% and that should be part of any LaTeX installation.
+%
+% be able to include figures
+\usepackage{graphicx}
+% get nice colors
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 3\\
+John Pharo\\
+Date: \today \\
+Blood Brothers: Anthony Alvarez, Cutter Coryell, David Vartanyan
+\end{center}
+
+\section*{Problem 1}
+
+\subsection*{(a)}
+
+We will compute the integral
+
+$$ \int_0^{\pi} f(x) dx = \int_0^{\pi} \sin(x) dx = 2 $$
+
+using the Midpoint Rule, the Trapezoid Rule, and Simpson's Rule with a step size of 0.01. The results are (the ordering of the errors is (absolute, relative)):
+
+Midpoint Rule \\
+Value: 2.00000706508 \\
+Errors: (-7.0650798953408867e-06, -3.5325399476704433e-06)
+
+Trapezoidal Rule \\
+Value: 1.99994799207 \\
+Errors: (5.2007928589281605e-05, 2.6003964294640802e-05)
+
+Simpsons Rule \\
+Value: 1.99998737408 \\
+Errors: (1.2625922932940625e-05, 6.3129614664703126e-06) \\
+
+Now let's reduce the step size by a factor of 10 \\
+
+Midpoint Rule \\
+Value: 2.00000000037 \\
+Errors: (-3.6778446954599531e-10, -1.8389223477299765e-10)
+
+Trapezoidal Rule \\
+Value: 1.99999975037 \\
+Errors: (2.4963220757179272e-07, 1.2481610378589636e-07)
+
+Simpsons Rule \\
+Value: 1.99999991703 \\
+Errors: (8.2965546432944848e-08, 4.1482773216472424e-08) \\
+
+Next, we'll use these methods to compute the integral
+
+$$ I = \int_0^{\pi} x \sin(x) dx = \pi $$
+
+Midpoint Rule \\
+Value: 3.14160174726 \\
+Errors: (-9.0936699561616763e-06, -2.8946050487387799e-06)
+
+Trapezoidal Rule \\
+Value: 3.14145510764 \\
+Errors: (0.00013754594899140216, 4.3782235368494702e-05)
+
+Simpsons Rule \\
+Value: 3.14155286739 \\
+Errors: (3.9786203026359601e-05, 1.2664341757005714e-05) \\
+
+Now let's reduce the step size by a factor of 10 \\
+
+Midpoint Rule \\
+Value: 3.14159252386 \\
+Errors: (1.2973284624351322e-07, 4.129524752207191e-08)
+
+Trapezoidal Rule \\
+Value: 3.14159213106 \\
+Errors: (5.2253375004696068e-07, 1.6632765850463738e-07)
+
+Simpsons Rule \\
+Value: 3.14159239292 \\
+Errors: (2.6066648084466237e-07, 8.297271784959373e-08)
+
+
+\section*{Problem 2}
+
+\subsection*{(a)}
+
+In order to use Gauss-Laguerre Quadrature, I must modify the integral as follows:
+
+$$ \frac{8 \pi (k_B T)^3}{(2 \pi \hbar c)^3} \int_0^{\infty} \frac{x^2 dx}{e^x + 1} = \frac{8 \pi (k_B T)^3}{(2 \pi \hbar c)^3} \int_0^{\infty} \frac{x^2 e^{-x} dx}{1 + e^{-x}} = \frac{8 \pi (k_B T)^3}{(2 \pi \hbar c)^3} \int_0^{\infty} e^{-x} f(x) dx $$
+
+Using scipy's ability to calculate the roots and weights for Gauss-Laguerre Quadrature, I was then able to calculate the number density (in m$^{-3}$) for $n=10$ and $n = 100$. Larger values of $n$ took a really long time to calculate, and the change in result was negligible.
+
+\[
+\begin{array}{ccc}
+n & 10 & 100 \\
+n_e & 1.89822604979*10^{41} & 1.8982157567*10^{41}
+\end{array}
+\]
+
+\subsection*{(b)}
+
+Since $E = pc$, the integral we're looking at for this problem should look like the middle expression in Equation 1, except for an added factor of $c^{-3}$. Using the method described in the problem, I calculate the number density again, but with Gauss-Legendre Quadrature. This time, I did so for $n=100$ and $n=500$, although the difference between them appears to be lower than the float precision,as both results returned
+
+$$ n_e = 7.41900699135*10^{41} $$
+
+I'm not really sure why this isn't the same as the result for part (a). 
+
+\end{document}
