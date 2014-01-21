@@ -1,0 +1,70 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 4\\
+John Pharo\\
+Date: \today \\
+Comrades-In-Arms: Anthony Alvarez, Cutter Coryell
+\end{center}
+
+\section*{Eccentricity Anomaly}
+
+I solve for the roots of Equation 4 by using Newton's method. After first testing my method on a simple parabola, I ran it on the eccentric anomaly function with an initial guess of $x=0$ for the root. The results for each given time $t$ can be seen in the following table.
+
+\[
+\begin{array}{ccccc}
+t(\text{days}) & \text{Iterations} & E & X & Y \\
+91 & 4 & 1.58209228899 & -16898.4000718 & 1495695.94618 \\
+182 & 4 & 3.13096420068 & -1495915.50372 & 15897.6488829 \\
+273 & 4 & 4.67948910053 & -49209.3417558 & -1494981.92489 \\
+\end{array}
+\]
+
+To get the fractional accuracy the worksheet requrested, the threshold for Newton's method was set at $10^{-10}$. One can see that each time required only 4 interations to arrive at the value of $E$, demonstrating one of the strengths of Newton's method. It's drawbacks, such as occasionally being wrong, are fortunately not demonstrated here. \\
+
+Now suppose the eccentricity changes to $e=0.99999$. This changes one of the values in Equation 4, and the output changes accordingly.
+
+\[
+\begin{array}{ccccc}
+t(\text{days}) & \text{Iterations} & E & X & Y \\
+91 & 1519 & 2.30664638749 & -1004141.40161 & 1108770.9818
+\end{array}
+\]
+
+Unfortunately, now Newton's Method takes over 1500 iterations, which is way longer than before. We can hopefully make this converge a lot faster by making a better initial guess about where the root is. With the eccentricity so close to one, we have an elliptical orbit that has been stretched out, with one of the foci running away from the Sun to infinity. In that case, we can guess that $E$ will be closer to $\pi$, since the ellipse is almost stretched flat. Putting in this guess instead of 0, we get
+
+\[
+\begin{array}{ccccc}
+t(\text{days}) & \text{Iterations} & E & X & Y \\
+91 & 5 & 2.30664638749 & -1004141.40161 & 1108770.9818 \\
+182 & 3 & 3.13618964107 & -1495978.16403 & 8081.74021489 \\
+273 & 5 & 3.96364377765 & -1018357.27326 & -1095732.41579
+\end{array}
+\]
+
+So we end up with the same solutions, but this time in only 5 iterations. That's a massive improvement just by using the geometry of the orbit to make a better guess. Calculating with other values of $t$ and this guess yield a similarly small number of iterations.
+
+\end{document}
