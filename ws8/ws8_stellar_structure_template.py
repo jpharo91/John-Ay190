@@ -62,8 +62,7 @@ def tov_integrate_RK2(rad, dr, p, rho, m):
 
     # Runge-Kutta 2 Integrator
     k1 = dr*tov_RHS(rad,rho,m)
-    k2 = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[0])
-    #k2[1] = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])[1]
+    k2 = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])
     new = old + k2
 
     #assign outputs
@@ -85,8 +84,7 @@ def tov_integrate_RK3(rad, dr, p, rho, m):
     # Runge-Kutta 3 Integrator
     k1 = dr*tov_RHS(rad,rho,m)
     k2 = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])
-    k3 = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[0]+2.0*k2[1])
-    #k3[1] = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[0]+2.0*k1[1])[1]
+    k3 = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[1]+2.0*k2[1])
     new = old + (1.0/6.0)*(k1 + 4.0*k2 + k3)
 
     #assign outputs
@@ -108,12 +106,9 @@ def tov_integrate_RK4(rad, dr, p, rho, m):
 
     # Runge-Kutta 4 Integrator
     k1 = dr*tov_RHS(rad,rho,m)
-    k2[0] = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])[0]
-    k2[1] = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])[1]
-    k3[0] = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[0]+2.0*k1[1])[0]
-    k3[1] = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[0]+2.0*k1[1])[1]
-    k4[0] = dr * tov_RHS(rad+dr,P2rho(p+k3[0]),m)[0]
-    k4[1] = dr * tov_RHS(rad+dr,P2rho(p+k3[0]),m+k3[1])[1]
+    k2 = dr * tov_RHS(rad+.5*dr,P2rho(p+.5*k1[0]),m+.5*k1[1])
+    k3 = dr * tov_RHS(rad+dr,P2rho(p-k1[0]+2.0*k2[0]),m-k1[1]+2.0*k1[1])
+    k4 = dr * tov_RHS(rad+dr,P2rho(p+k3[0]),m+k3[1])
     new = old + (1.0/6.0)*(k1 + 2.0*k2 + 2.0*k3 + k4)
 
     #assign outputs
@@ -146,7 +141,7 @@ press_min = 1.0e-10 * press[0]
 nsurf = 0
 for n in range(npoints-1):
     
-    (press[n+1],mass[n+1]) = tov_integrate_RK3(radius[n],
+    (press[n+1],mass[n+1]) = tov_integrate_RK4(radius[n],
                                               dr,
                                               press[n],
                                               rho[n],mass[n])
