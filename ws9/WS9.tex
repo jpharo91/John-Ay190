@@ -1,0 +1,84 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Load some basic packages that are useful to have
+% and that should be part of any LaTeX installation.
+%
+% be able to include figures
+\usepackage{graphicx}
+% get nice colors
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 9\\
+John Pharo\\
+Date: \today\\
+Scooby Gang: David Vartanyan, Cutter Coryell
+\end{center}
+
+\section*{Problem 1}
+
+We have five linear systems of varying sizes. In order to solve the systems, we first need to check a couple of things. First, $A$ needs to be a square matrix whose dimensions are the same as the length of $b$. Then we need to make sure that $A$ is invertible, which is the same as checking that det($A$) != 0. The script read.py checks the sizes (they're fine) and the invertibility (they also all pass this), and the five data sets should be solvable. LSE1 is 10x10, LSE2 is 100x100, LSE3 is 200x200, LSE4 is 1000x1000, and LSE5 is 2000x2000.
+
+\section*{Problem 2}
+
+In lieu of writing my own Gauss Elimination function, I found one online from MIT: \\
+http://ine.scripts.mit.edu/blog/2011/05/gaussian-elimination-in-python/ \\
+
+To test the Gauss Elimination function, I'm going to use two 3x3 LSE's I found on Wikipedia:
+
+$$ 3x + 2y - z = 1 \hspace*{.5in} 2x - 2y + 4z = -2 \hspace*{.5in} -x + \frac{1}{2}y - z = 0 $$
+
+The known solution to this system is $x=1, y=-2, z=-2$. Another example found on the Gaussian elimination page is
+
+$$ 2x + y - z = 8 \hspace*{.5in} -3x - y + 2z = -11 \hspace*{.5in} -2x + y + 2z = -3 $$
+
+The known solution for this one is $x=2, y=3, z=-1$. Testing the myGauss function on these, I recover the known solutions. Then I may proceed to running the function on the supernova LSE's, and to figure out how long it takes to do so. 
+
+\[
+\begin{array}{cc}
+LSE & \text{Times(s)} \\
+1 & 0.0013191699981689453 \\
+2 & 1.191711187362671 \\
+3 & 9.732844114303589 \\
+4 & 1259.8038818836212 \\
+5 & 10298.86017203331
+\end{array}
+\]
+
+\section*{Problem 3}
+
+\[
+\begin{array}{cc}
+LSE & \text{Times(s)} \\
+1 & 4.982948303222656e-05 \\
+2 & 0.0007839202880859375 \\
+3 & 0.0040018558502197266 \\
+4 & 0.4685628414154053 \\
+5 & 3.8332340717315674
+\end{array}
+\]
+
+Numpy's linalg.solve function uses the lapack gesv code, which uses LU decomposition with partial pivoting and row interchanges to solve the system.
+
+\end{document}
