@@ -1,0 +1,112 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Load some basic packages that are useful to have
+% and that should be part of any LaTeX installation.
+%
+% be able to include figures
+\usepackage{graphicx}
+% get nice colors
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 11\\
+John Pharo\\
+Date: \today\\
+Lords of Waterdeep: Mee Chatarin Wongurailertkun, David Vartanyan
+\end{center}
+
+\section*{Problem 2}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{Upwind.pdf}
+\caption{This is the plot of the upwind model using $\sigma = \sqrt{15}$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{Upwind2.pdf}
+\caption{This is the plot of the upwind model where $\sigma = \sqrt{15}/5$. Notice that, after 2000 iterations, the numerical solution diverges pretty strongly, especially about the center.}
+\label{fig:simpleplot}
+\end{figure}
+
+\section*{Problem 3}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{FTCS4.pdf}
+\caption{This is the plot of the FTCS model for $n=500$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{FTCS3.pdf}
+\caption{This is the plot of the FTCS model for $n=1000$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{FTCS2.pdf}
+\caption{This is the plot of the FTCS model for $n=1500$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{FTCS.pdf}
+\caption{This is the plot of the FTCS model for $n=2000$.}
+\label{fig:simpleplot}
+\end{figure}
+
+At first, the numerical solution stays relatively close to the analytical result, but at large numbers of iterations, the two diverge significantly, and the numerical solution becomes pretty unstable.
+
+\section*{Problem 4}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{LF2.pdf}
+\caption{This is the plot of the Lax-Friedrich model for $n=1500$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{LF3.pdf}
+\caption{This is the plot of the Lax-Friedrich model for $n=1000$.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{LF4.pdf}
+\caption{This is the plot of the Lax-Friedrich model for $n=500$.}
+\label{fig:simpleplot}
+\end{figure}
+
+The Lax-Friedrich model begins to diverge from the analytical result at about $n=500$, producing a shorter and wider Gaussian profile.
+
+\end{document}
