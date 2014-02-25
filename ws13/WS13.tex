@@ -1,0 +1,57 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Load some basic packages that are useful to have
+% and that should be part of any LaTeX installation.
+%
+% be able to include figures
+\usepackage{graphicx}
+% get nice colors
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 13\\
+John Pharo\\
+Date: \today\\
+Supernova Remnants: Matthias Raives, Mee Chatarin Wongurailertkun
+\end{center}
+
+\section*{Problem 1}
+
+I have familiarized myself.
+
+\section*{Problem 2}
+
+I simulated the Sun-Earth system for 4 years. The radius of the orbit remained basically constant over the course of the simulation.
+
+\section*{Problem 3}
+
+With 10$^4$ points over 4 years, the magnitude of the largest change in energy is around 2.76*10$^{37}$, which amounts to about a tenth of a percent of the energy in the system. As the resolution increases, this magnitude decreases even further.
+
+\section*{Problem 4}
+
+Over the century, the system changes energy by about 7*10$^{50}$ ergs. This is a large fraction of the energy remaining in the system, which is much worse than in the previous problems, but that is to be expected, since the simplistic n-body model begins to fail in more complicated systems. \\
+
+This can further be seen by comparing the trajectories in stars13.dat. The simulation diverges from observation rather quickly.
+
+\end{document}
