@@ -36,7 +36,7 @@ Date: \today\\
 Starship Rangers: Mee Chatarin Wongurailertkun, David Vartanyan, Cutter Coryell
 \end{center}
 
-\section{Problem 1}
+\section*{Problem 1}
 
 I wrote a basic python script to read in and plot the different columns in the data file. The first column is obviously just an index; the second ranges from about 0 to $10^{34}$, which, assuming reasonable astronomical units, can only make sense as the enclosed mass. \\
 
@@ -77,6 +77,20 @@ I use a cubic interpolation from scipy's interp1d module.
 
 \section*{Problem 3}
 
-My code produces results that are sometimes 3 orders of magnitude off from the plot of Equation 3, and I absolutely can't figure out why. 
+See Figures 4 and 5.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{Homogeneous}
+\caption{This is a plot of the numerical and analytic solutions to the potential of the homogeneous sphere (with a set density of $10^5 g/cm^3$). The relative error never exceeds one percent, and the points at the surface match exactly (since the constant adjustment requires this). Calculating the convergence rate at the first points yields a rate of 1.01069547085, though the rate should be ~2. I can't figure out why this is.}
+\label{fig:simpleplot}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{Presupernova}
+\caption{This is the plot of the presupernova model's potential, having validated my code for determining the potential.}
+\label{fig:simpleplot}
+\end{figure}
 
 \end{document}
