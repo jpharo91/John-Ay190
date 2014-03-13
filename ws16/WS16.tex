@@ -1,0 +1,134 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Load some basic packages that are useful to have
+% and that should be part of any LaTeX installation.
+%
+% be able to include figures
+\usepackage{graphicx}
+% get nice colors
+\usepackage{xcolor}
+
+% change default font to Palatino (looks nicer!)
+\usepackage[latin1]{inputenc}
+\usepackage{mathpazo}
+\usepackage[T1]{fontenc}
+% load some useful math symbols/fonts
+\usepackage{latexsym,amsfonts,amsmath,amssymb}
+
+% comfort package to easily set margins
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% control some spacings
+%
+% spacing after a paragraph
+\setlength{\parskip}{.15cm}
+% indentation at the top of a new paragraph
+\setlength{\parindent}{0.0cm}
+
+
+\begin{document}
+
+\begin{center}
+\Large
+Ay190 -- Worksheet 16\\
+John Pharo\\
+Date: \today\\
+Fiddlers on the Roof: Mee Chatarin Wongurailertkun, Cutter Coryell
+\end{center}
+
+\section*{Problem 1}
+
+This hydrodynamics code is based around a mydata object which stores most of the relevant hydrodynamic data of the system. It stores lists of cell centers, conserved variables, and pressures. The mydata object has several methods defined on it for the purposes of evolving the system in time. \\
+
+These include functions to set up the 1-D grid and the initial values of the system. In the main program, these are the first methods called, immediately after variables are set with various initial conditions. Passing these variables to these methods sets up the initial state of the system. \\
+
+Next are a variety of helper methods for switching between primitive and conserved variables, applying the boundary conditions, and implementing various reconstruction methods. These will all be called by the final helper methods, hlle and calc-rhs, which actually update the system. \\
+
+In the main code, once the mydata object is initialized and the grid setup, the program enters a while loop, which will iterate until the specified end time is reached. In the while loop, the program updates the plot of the system, and then calculates the dynamic time step. After that, the program calculates the new rhs, intermediate step, and boundaries, and then uses these to update the mydata object. Finally, it updates the time, and the loop resumes.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-10.pdf}
+\caption{This is the system at t=0.01 s, so essentially in its initial state.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-100.pdf}
+\caption{This is the system at t=0.1 s.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-150.pdf}
+\caption{This is the system at t=0.15 s.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-200.pdf}
+\caption{This is the system at t=0.2 s.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-250.pdf}
+\caption{This is the system at t=0.25 s.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-5000.pdf}
+\caption{This is the system after a much greater time has passed, at t=5.0 s.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\section*{Problem 2}
+
+See figures 4 through 9.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-200.pdf}
+\caption{This is the system at t=0.2 s, using the piecewise constant method of reconstruction. This appears to produce the smoothest solution, and it spreads to a greater width in the same amount of time.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{mc.pdf}
+\caption{This is the system at t=0.2 s, using the TVD-MC2 method of reconstruction. This is the least smooth solution, appearing pretty choppy and also mostly vertical; the shock didn't spread very far.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{minmod.pdf}
+\caption{This is the system at t=0.2 s, using the TVD-minmod method of reconstruction.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\section*{Problem 4}
+
+Using for loops for the code that I wrote, running hlle 10 times takes 0.29532289505 s, but by using numpy arrays, it takes only 0.233140945435 s. Since I only replaced the for loops in the code I changed, there are still for loops in hlle, which, if replaced, could potentially decrease the time needed even more.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{t-200.pdf}
+\caption{This is the system at t=0.2 s, using for loops.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{numpy.pdf}
+\caption{This is the system at t=0.2 s, using numpy arrays. Note that it is identical to the previous solution, though the method changed.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\end{document}
