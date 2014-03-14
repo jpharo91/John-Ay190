@@ -24,7 +24,7 @@ rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 
 # simulation parameters
-npoints = 1e4
+n_points = 1e4
 
 # initial data
 hulse_taylor_periastron = 1.1 * rsun
@@ -177,32 +177,32 @@ rmax = 1.1 * init_major_axis * (1 + init_eccentricity) # 1.1 * apastron
 M = m1 + m2
 mu = (m1 * m2) / M
 
-times = np.linspace(t, t_final, num=npoints)
+times = np.linspace(t, t_final, num=n_points)
 dt = times[1] - times[0]
 
 # array of true anomaly at each time step
-phis = np.zeros(npoints)
+phis = np.zeros(n_points)
 
 # array of semi-major axis at each time step
-axs = np.zeros(npoints)
+axs = np.zeros(n_points)
 axs[0] = init_major_axis
 
 # array of eccentricity at each time step
-eccs = np.zeros(npoints)
+eccs = np.zeros(n_points)
 eccs[0] = init_eccentricity
 
 # array of separation vector at each time step
-xs = np.zeros((3, npoints))
+xs = np.zeros((3, n_points))
 xs[:,0] = eval_x(phis[0], axs[0], eccs[0])
 
 # array of reduced quadrupole tensor at each time step
-quads = np.zeros((3, 3, npoints))
+quads = np.zeros((3, 3, n_points))
 
 # array of plus-polarized gravitational wave strain at each time step
-hpluses = np.zeros(npoints)
+hpluses = np.zeros(n_points)
 
 # array of cross-polarized gravitational wave strain at each time step
-hcrosses = np.zeros(npoints)
+hcrosses = np.zeros(n_points)
 
 
 # main loop 
