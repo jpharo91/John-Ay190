@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import numpy as np
+import matplotlib.pyplot as pl
+import mpl_toolkits.plot3d as mpl3d
 
 # general constants
 ggrav = 6.67e-8
@@ -158,3 +160,15 @@ for it, t in enumerate(times):
         momentum[it] = integrate_momentum()
         x = orbit()
         x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
+
+        # Plot stuff
+        plt.clf()
+        fig = plt.gcf()
+        ax = mpl3d.Axes3D(fig)
+        ax.scatter(x[0], x[1], x[2]) #Proably need to make x an np array
+        ax.set_xlim((-rmax,rmax)) #Need to define rmax, probably 1.1 times initial x, or something
+        ax.set_ylim((-rmax,rmax))
+        ax.set_zlim((-rmax,rmax))
+        pl.draw()
+
+pl.show()
