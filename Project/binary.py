@@ -22,7 +22,10 @@ def second_time_der(quantity):
 def third_time_der(quantity):
 
 # Function to calculate new orbital separation vector
-def orbit():
+def orbit(E, L, t):
+    eccentricity = np.sqrt(1.0 + (2.0*E*L*L)/(ggrav*M)**2)
+    p = L*L/(ggrav*M)
+    r = p/(1 - e*np.cos(phi(t))) #Need to define phi function
 
 # Function to calculate current reduced quadrupole tensor
 def quadrupole():
