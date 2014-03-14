@@ -36,14 +36,17 @@ def wave():
 ####################################
 # main code body
 
-# set up initial conditions
-m1 = 1.4*msun
-m2 = 1.0*msun
-M = m1 + m2
-mu = (m1 * m2) / M
+# parameters
 npoints = 10000
 t = 0.0
 t_final = 100.0
+m1 = 1.4*msun
+m2 = 1.0*msun
+
+# set up initial conditions
+M = m1 + m2
+mu = (m1 * m2) / M
+
 times = np.linspace(t, t_final, num=npoints)
 dt = times[1] - times[0]
 x = [1.0, 1.0, 1.0]
