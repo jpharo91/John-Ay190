@@ -41,9 +41,12 @@ m1 = 1.4*msun
 m2 = 1.0*msun
 M = m1 + m2
 mu = (m1 * m2) / M
+npoints = 10000
 t = 0.0
-t_final = 5.0
-dt = 0.1
+t_final = 100.0
+times = np.linspace(t, t_final, num=npoints)
+dt = times[1] - times[0]
+x = [1.0, 1.0, 1.0]
 
 # while loop until end conditions met
 # calculate time step, update energy and momentum, update orbits, update time
