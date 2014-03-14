@@ -16,15 +16,12 @@ import mpl_toolkits.mplot3d as mpl3d
 ####################################
 # Constants and Parameters
 
-# general constants (CGS)
+# general constants (CGS units)
 ggrav = 6.67e-8
 c = 3.0e10
 msun = 1.99e33
 rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
-
-# simulation parameters
-n_points = 1e4
 
 # initial data
 hulse_taylor_periastron = 1.1 * rsun
@@ -32,9 +29,10 @@ hulse_taylor_apastron = 4.8 * rsun
 hulse_taylor_a = 0.5 * (hulse_taylor_periastron + hulse_taylor_apastron)
 hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
-# system parameters (CGS)
+# parameters (CGS units)
 t = 0.0 # initial time
 t_final = 1e7 # final time
+n_points = 1e4
 init_major_axis = hulse_taylor_a
 init_eccentricity = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
