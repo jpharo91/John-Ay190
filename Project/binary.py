@@ -4,7 +4,7 @@ import numpy as np
 
 # general constants
 ggrav = 6.67e-8
-c = 3.0e9
+c = 3.0e10
 msun = 1.99e33
 
 
@@ -26,12 +26,6 @@ def momentum_loss():
 # Function to calculate timestep
 def timestep():
 
-# Function to calculate new energy
-def energy():
-
-# Function to calculate new energy
-def momentum():
-
 # Function to calculate new orbital separation vector
 def orbit():
 
@@ -49,14 +43,12 @@ M = m1 + m2
 mu = (m1 * m2) / M
 t = 0.0
 t_final = 5.0
+dt = 0.1
 
 # while loop until end conditions met
 # calculate time step, update energy and momentum, update orbits, update time
 while (t < t_final):
-    dt = timestep
-    old_energy = energy
-    old_mom = momentum
-    energy = old_energy + dt * energy_loss()
-    momentum = old_mom + dt * momentum_loss()
+    energy[i] = integrate_energy(old_energy, I, dt)
+    momentum[i] = old_mom + dt * momentum_loss()
     x = orbit()
     t += dt
