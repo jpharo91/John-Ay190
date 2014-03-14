@@ -12,35 +12,50 @@ frac = 1.0/6.0
 ####################################
 # helper functions
 
-# Function to calculate the first time derivative of `quantity`
+
 def first_time_der(quantity):
+    """
+    Function to calculate the first time derivative of `quantity`.
+    """
 
-# Function to calculate the secoond time derivative of `quantity`
+
 def second_time_der(quantity):
+    """
+    Function to calculate the second time derivative of `quantity`.
+    """
 
-# Function to calculate the third time derivative of `quantity`
 def third_time_der(quantity):
+    """
+    Function to calculate the third time derivative of `quantity`.
+    """
 
-# Function to calculate new orbital separation vector
+
 def orbit(E, L, t):
+    """
+    Function to calculate new orbital separation vector.
+    """
     eccentricity = np.sqrt(1.0 + (2.0*E*L*L)/(ggrav*M)**2)
     p = L*L/(ggrav*M)
     r = p/(1 - e*np.cos(phi(t))) #Need to define phi function
 
-# Function to calculate current reduced quadrupole tensor
 def quadrupole():
+    """
+    Function to calculate current reduced quadrupole tensor.
+    """
 
-# Function to calculate the righthand-side of the energy evolution equation
 def energy_RHS(tensor):
+    """
+    Function to calculate the righthand-side of the energy evolution equation.
+    """
     temp = third_time_der(tensor)
-    coeff = ggrav / (5.0 * c**5)
+    coeff = ggrav / (5. * c**5)
     return coeff * temp * temp
 
 def perm_parity(lst):
-    '''\
+    """
     Given a permutation of the digits 0..N in order as a list, 
     returns its parity (or sign): +1 for even parity; -1 for odd.
-    '''
+    """
     parity = 1
     for i in range(0,len(lst)-1):
         if lst[i] != i:
@@ -49,47 +64,56 @@ def perm_parity(lst):
             lst[i],lst[mn] = lst[mn],lst[i]
     return parity
 
-# Function to calculate the Levi-Civita tensor
 def lc(i, j, k):
+    """
+    Function to calculate the Levi-Civita tensor \( \epsilon_{i,j,k} \).
+    """
     if i == j or i == k or j == k:
         return 0
     else:
         return perm_parity([i,j,k])
 
-# Function to calculate the righthand-side of the angular momentum evolution equation
 def momentum_RHS(tensor, axis):
-    coeff = (2.0 * ggrav)/(5.0 * c**5)
-    epsilon = lc(axis, j, k) #Not sure how to make this work
-    m_vals = [0,1,2]
-    derivs = 0
-    for m in m_vals:
-        derivs += third_time_der(tensor[j,m]) * third_time_der(tensor[k,m])
-    return coeff * epsilon * derivs
+    """
+    Function to calculate the righthand-side of the angular momentum evolution equation.
+    """
+    coeff = (2. * ggrav) / (5. * c**5)
+    dirs = [1, 2, 3] # three spatial directions
+    total = 0.
+    for j in dirs:
+        for k in dirs:
+            for m in dirs:
+                epsilon = lc(axis, j, k)
+                total += (coeff * epsilon * second_time_der(tensor[j][m])
+                           * third_time_der(tensor[k][m]))
+    return coeff * total
 
-# Function to calculate the righthand-side of the energy evolution equation
-def integrate_energy(tensor, t, dt, E):
-    old = E
-    k1 = dt * energyRHS(tensor)
-    k2 = dt * energyRHS(t + dt/2.0, tensor + k1/2.0) #Not sure if t is actually necessary
-    k3 = dt * energyRHS(t + dt/2.0, tensor + k2/2.0) #Maybe need function to give tensor
-    k4 = dt * energyRHS(t + dt, tensor + k3)         # as a function of time
+def integrate_energy(tensor, t, E):
+    """
+    Function to calculate the righthand-side of the energy evolution equation
+    """
+    k1 = energyRHS(quadrupole(t))
+    k2 = energyRHS(tensor + k1/2.0) #Not sure if t is actually necessary
+    k3 = energyRHS(t + dt/2.0, tensor + k2/2.0) #Maybe need function to give tensor
+    k4 = energyRHS(t + dt, tensor + k3)         # as a function of time
 
-    new = old + frac * (k1 + 2.0*k2 + 2.0*k3 + k4)
-    return new
+    return E + dt * (k1 + 2.*k2 + 2.*k3 + k4) / 6.
 
-# Function to calculate the righthand-side of the angular momentum evolution equation
 def integrate_momentum():
-    old = p
-    k1 = dt * momentum_RHS()
-    k2 = dt * momentum_RHS()
-    k3 = dt * momentum_RHS()
-    k4 = dt * momentum_RHS()
+    """
+    Function to calculate the righthand-side of the angular momentum evolution equation
+    """
+    k1 = momentum_RHS()
+    k2 = momentum_RHS()
+    k3 = momentum_RHS()
+    k4 = momentum_RHS()
 
-    new = old + frac * (k1 + 2.0*k2 + 2.0*k3 + k4)
-    return new
+    return L + dt * (k1 + 2.*k2 + 2.*k3 + k4) / 6.
 
-# Function to calculate gravitational wave
 def wave():
+"""
+Function to calculate gravitational wave
+"""
 
 
 ####################################
