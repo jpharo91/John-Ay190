@@ -7,11 +7,20 @@ ggrav = 6.67e-8
 c = 3.0e10
 msun = 1.99e33
 frac = 1.0/6.0
-
+direcs = [1, 2, 3] # indices corresponding to the three spatial directions
 
 ####################################
 # helper functions
 
+def kron_delta(i, j):
+    """
+    Computes the Kronecker delta of `i` and `j`; that is,
+    returns 1 if `i` == `j` and 0 otherwise.
+    """
+    if i == j:
+        return 1
+    else:
+        return 0
 
 def first_time_der(quantity):
     """
@@ -38,10 +47,28 @@ def orbit(E, L, t):
     p = L*L/(ggrav*M)
     r = p/(1 - e*np.cos(phi(t))) #Need to define phi function
 
-def quadrupole():
+def quadrupole(x):
     """
     Function to calculate current reduced quadrupole tensor.
     """
+    I_bar = {1:{}, 2:{}, 3:{}}
+    for i in direcs:
+        for j in direcs:
+            I_bar[i][j] = mu * (x[i-1] * x[j-1] - kron_delta(i,j) * np.linalg.norm(x) / 3.)
+    return I_bar
+
+def phi_RHS(r, L):
+    return L / r**2
+
+def integrate_RK4(quantities):
+
+
+def integrate_phi(phi, r, L):
+    k1 = phi_RHS(r, L)
+    k2 = phi_RHS(tensor + k1/2.0) #Not sure if t is actually necessary
+    k3 = energyRHS(t + dt/2.0, tensor + k2/2.0) #Maybe need function to give tensor
+    k4 = energyRHS(t + dt, tensor + k3)         # as a function of time
+
 
 def energy_RHS(tensor):
     """
@@ -78,11 +105,11 @@ def momentum_RHS(tensor, axis):
     Function to calculate the righthand-side of the angular momentum evolution equation.
     """
     coeff = (2. * ggrav) / (5. * c**5)
-    dirs = [1, 2, 3] # three spatial directions
+    direcs = [1, 2, 3] # three spatial directions
     total = 0.
-    for j in dirs:
-        for k in dirs:
-            for m in dirs:
+    for j in direcs:
+        for k in direcs:
+            for m in direcs:
                 epsilon = lc(axis, j, k)
                 total += (coeff * epsilon * second_time_der(tensor[j][m])
                            * third_time_der(tensor[k][m]))
@@ -111,9 +138,9 @@ def integrate_momentum():
     return L + dt * (k1 + 2.*k2 + 2.*k3 + k4) / 6.
 
 def wave():
-"""
-Function to calculate gravitational wave
-"""
+    """
+    Function to calculate gravitational wave
+    """
 
 
 ####################################
@@ -136,19 +163,20 @@ x = [1.0, 1.0, 1.0]
 x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
 x_min = 2e6
 
+# orbital angle
+phi = np.zeros(npoints)
 # total system energy
 energy = np.zeros(npoints)
 # total system angular momentum
 momentum = np.zeros(npoints)
 # system reduced quadrupole tensor (sets up a 3x3 dictionary indexed like quad[i][j])
 quad = {1:{}, 2:{}, 3:{}}
-for i in range(1,4):
-    quad[i] = {}
-    for j in range(1,4):
+for i in direcs:
+    for j in direcs:
         quad[i][j] = np.zeros(npoints)
 
 
-# main loop
+### main loop ###
 for it, t in enumerate(times):
 
     if x_mag < x_min:
@@ -157,4 +185,3 @@ for it, t in enumerate(times):
         energy[it] = integrate_energy()
         momentum[it] = integrate_momentum()
         x = orbit()
-        x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
