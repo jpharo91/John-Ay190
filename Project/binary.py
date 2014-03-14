@@ -34,7 +34,7 @@ hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
 # system parameters (CGS)
 t = 0.0 # initial time
-t_final = 1e5 # final time
+t_final = 1e7 # final time
 init_major_axis = hulse_taylor_a
 init_eccentricity = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
