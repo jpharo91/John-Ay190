@@ -11,23 +11,32 @@ msun = 1.99e33
 ####################################
 # helper functions
 
-# Function to calculate array of reduced quadrupole tensor
-def quadrupole():
+# Function to calculate the first time derivative of `quantity`
+def first_time_der(quantity):
 
-# Function to calculate time derivatives of the reduced quadrupole tensor
-def dquadrupole():
+# Function to calculate the secoond time derivative of `quantity`
+def second_time_der(quantity):
 
-# Function to calculate the energy loss rate
-def energy_loss():
-
-# Function to caculate the momentum loss rate
-def momentum_loss():
-
-# Function to calculate timestep
-def timestep():
+# Function to calculate the third time derivative of `quantity`
+def third_time_der(quantity):
 
 # Function to calculate new orbital separation vector
 def orbit():
+
+# Function to calculate current reduced quadrupole tensor
+def quadrupole():
+
+# Function to calculate the righthand-side of the energy evolution equation
+def energy_RHS():
+
+# Function to calculate the righthand-side of the angular momentum evolution equation
+def momentum_RHS():
+
+# Function to calculate the righthand-side of the energy evolution equation
+def integrate_energy():
+
+# Function to calculate the righthand-side of the angular momentum evolution equation
+def integrate_momentum():
 
 # Function to calculate gravitational wave
 def wave():
@@ -51,10 +60,20 @@ times = np.linspace(t, t_final, num=npoints)
 dt = times[1] - times[0]
 x = [1.0, 1.0, 1.0]
 
-# while loop until end conditions met
-# calculate time step, update energy and momentum, update orbits, update time
-while (t < t_final):
-    energy[i] = integrate_energy(old_energy, I, dt)
-    momentum[i] = old_mom + dt * momentum_loss()
+# total system energy
+energy = np.zeros(npoints)
+# total system angular momentum
+momentum = np.zeros(npoints)
+# system reduced quadrupole tensor (sets up a 3x3 dictionary indexed like quad[i][j])
+quad = {1:{}, 2:{}, 3:{}}
+for i in range(1,4):
+    quad[i] = {}
+    for j in range(1,4):
+        quad[i][j] = np.zeros(npoints)
+
+
+# main loop
+for it, t in enumerate(times):
+    energy[it] = integrate_energy()
+    momentum[it] = integrate_momentum()
     x = orbit()
-    t += dt
