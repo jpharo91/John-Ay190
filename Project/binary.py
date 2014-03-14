@@ -50,11 +50,14 @@ mu = (m1 * m2) / M
 times = np.linspace(t, t_final, num=npoints)
 dt = times[1] - times[0]
 x = [1.0, 1.0, 1.0]
+x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
+x_min = 2e6
 
 # while loop until end conditions met
 # calculate time step, update energy and momentum, update orbits, update time
-while (t < t_final):
+while (t < t_final and x_mag > x_min):
     energy[i] = integrate_energy(old_energy, I, dt)
     momentum[i] = old_mom + dt * momentum_loss()
     x = orbit()
+    x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
     t += dt
