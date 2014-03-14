@@ -80,4 +80,3 @@ for it, t in enumerate(times):
     momentum[it] = integrate_momentum()
     x = orbit()
     x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
-    t += dt
