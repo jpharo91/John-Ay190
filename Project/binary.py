@@ -59,6 +59,8 @@ mu = (m1 * m2) / M
 times = np.linspace(t, t_final, num=npoints)
 dt = times[1] - times[0]
 x = [1.0, 1.0, 1.0]
+x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
+x_min = 2e6
 
 # total system energy
 energy = np.zeros(npoints)
@@ -77,3 +79,5 @@ for it, t in enumerate(times):
     energy[it] = integrate_energy()
     momentum[it] = integrate_momentum()
     x = orbit()
+    x_mag = np.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2])
+    t += dt
