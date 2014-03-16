@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+    
 """
 John Pharo and Cutter Coryell
 Caltech Ay 190 Winter 2014 with Christian Ott
@@ -11,6 +11,7 @@ Analyzes data produced by simulate.py.
 import numpy as np
 import matplotlib.pyplot as pl
 import cPickle as pickle
+import subprocess
 
 
 ####################################
@@ -24,43 +25,44 @@ direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 ####################################
 # Parameters
 
-output_dir = "output5" # name of directory containing simulation output data
+output_dir = "billion" # name of directory containing simulation output data
 start_iteration = 0 # the first iteration to load
-n_points = 7700 # number of iterations of data to load
-input_every = 1 # inputs one data file for every `input_every` data files
+n_points = 400000 # number of iterations in the simulation
+input_every = 1000 # inputs one data file for every `input_every` data files
 m1 = 1.4*msun # mass of body 1
 m2 = 1.4*msun # mass of body 2
-
 
 ####################################
 # Load Data
 
+n_loaded = (n_points - start_iteration) / input_every # number of data files to load
+
 # array of time at each time step
-times = np.zeros(n_points)
+times = np.zeros(n_loaded)
 
 # array of true anomaly at each time step
-phis = np.zeros(n_points)
+phis = np.zeros(n_loaded)
 
 # array of semi-major axis at each time step
-axs = np.zeros(n_points)
+axs = np.zeros(n_loaded)
 
 # array of eccentricity at each time step
-eccs = np.zeros(n_points)
+eccs = np.zeros(n_loaded)
 
 # array of separation vector at each time step
-xs = np.zeros((3, n_points))
+xs = np.zeros((3, n_loaded))
 
 # array of reduced quadrupole tensor at each time step
-I_bars = np.zeros((3, 3, n_points))
+I_bars = np.zeros((3, 3, n_loaded))
 
 # array of plus-polarized gravitational wave strain at each time step
-h_pluses = np.zeros(n_points)
+h_pluses = np.zeros(n_loaded)
 
 # array of cross-polarized gravitational wave strain at each time step
-h_crosses = np.zeros(n_points)
+h_crosses = np.zeros(n_loaded)
 
-for it in range(n_points):
-    f = open("{}/iteration-{}.pickle".format(output_dir, it*input_every), 'rb')
+for it in range(n_loaded):
+    f = open("{}/iteration-{}.pickle".format(output_dir, start_iteration + it*input_every), 'rb')
     data = pickle.load(f)
     f.close()
     
@@ -91,5 +93,21 @@ Es = 0.5 * (ggrav * M / Ls)**2 * (eccs**2 - 1)
 ####################################
 # Plot Data
 
+fig_dir = output_dir + "_figs"
+subprocess.call("mkdir -p " + fig_dir, shell=True)
+
+pl.figure()
 pl.plot(times, axs, lw=8)
-pl.show()
+pl.savefig(fig_dir + "/semi-major_axis.pdf")
+
+pl.clf()
+pl.plot(times, eccs, lw=8)
+pl.savefig(fig_dir + "/eccentricity.pdf")
+
+pl.clf()
+pl.plot(times, Es, lw=8)
+pl.savefig(fig_dir + "/energy.pdf")
+
+pl.clf()
+pl.plot(times, Ls, lw=8)
+pl.savefig(fig_dir + "/angular_momentum.pdf")
