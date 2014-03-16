@@ -1,2 +1,0 @@
-t_final = 1e9
-n_points = 1e6
