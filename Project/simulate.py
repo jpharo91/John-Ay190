@@ -12,6 +12,9 @@ emission.
 import numpy as np
 import matplotlib.pyplot as pl
 import mpl_toolkits.mplot3d as mpl3d
+import cPickle as pickle
+import time
+import subprocess
 
 ####################################
 # Constants and Parameters
@@ -23,22 +26,25 @@ msun = 1.99e33
 rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 
-# initial data
+# initial data for Hulse-Taylor binary
 hulse_taylor_periastron = 1.1 * rsun
 hulse_taylor_apastron = 4.8 * rsun
 hulse_taylor_a = 0.5 * (hulse_taylor_periastron + hulse_taylor_apastron)
 hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
 # parameters (CGS units)
-t = 0.0 # initial time
-t_final = 1e7 # final time
-n_points = 1e4
-init_major_axis = hulse_taylor_a
-init_eccentricity = hulse_taylor_e
+input_dir = "output" # if none, a new simulation will be created
+start_iteration = 440279+1 # needs to be 0 if the above is `None`
+output_dir = "output" # name of directory to place output data in
+t_final = 1e9 # final time
+n_points = 1e6 # should be at least one point per 1000 s of simulated time
+init_a = hulse_taylor_a
+init_e = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
 m2 = 1.4*msun # mass of body 2
-min_separation = 1e7 # simulation terminates if separation falls beneath this
 
+if input_dir == None and start_iteration != 0:
+    raise ValueError("If input_dir is None, then start_iteration must be 0")
 
 ####################################
 # Helper Functions
@@ -53,36 +59,26 @@ def kron(i, j):
     else:
         return 0
 
-def first_time_der(quantity, it):
+def second_time_der(quantity0, quantity1, quantity2):
     """
-    Calculates the first time derivative of `quantity` at
-    iteration `it`. If not enough data to compute, returns 0.
+    Calculates the second time derivative of a quantity based on values
+    of that quantity at three times. The result is a
+    forward derivative at the time of `quantity0`, a central derivative
+    at the time of `quantity1`, and a backward derivative at the time of
+    `quantity2`. To summarize the arguments:
+    quantity0 = quantity(t_0)
+    quantity1 = quantity(t_0 + dt)
+    quantity2 = quantity(t_0 + 2*dt)
+    (for some t_0)
     """
-    try:
-        return (quantity[it] - quantity[it-1]) / dt
-    except IndexError:
-        return 0
+    return (quantity2 - 2*quantity1 + quantity0) / dt**2
 
-def second_time_der(quantity, it):
+def eval_r(phi, a, e):
     """
-    Calculates the second time derivative of `quantity` at
-    iteration `it`.  If not enough data to compute, returns 0.
+    Calculates the binary separation distance r.
+    From Equation 6 of the project description.
     """
-    try:
-        return (quantity[it] - 2*quantity[it-1] + quantity[it-2]) / dt**2
-    except IndexError:
-        return 0
-
-def third_time_der(quantity, it):
-    """
-    Calculates the third time derivative of `quantity` at
-    iteration `it`.  If not enough data to compute, returns 0.
-    """
-    try:
-        return (quantity[it] - 3*quantity[it-1] + 3*quantity[it-2]
-                                                  - quantity[it-3]) / dt**3
-    except IndexError:
-        return 0
+    return a * (1 - e**2) / (1 + e * np.cos(phi))
 
 def eval_x(phi, a, e):
     """
@@ -90,7 +86,7 @@ def eval_x(phi, a, e):
     """
     return eval_r(phi, a, e) * np.array([np.cos(phi), np.sin(phi), 0.])
 
-def eval_quad(x):
+def eval_I_bar(x):
     """
     Calculates new reduced quadrupole tensor.
     """
@@ -101,36 +97,21 @@ def eval_quad(x):
             I_bar[i,j] = mu * (x[i] * x[j] - kron(i,j) * xnormsq / 3.)
     return I_bar
 
+def eval_h_plus(I_bar0, I_bar1, I_bar2, r):
+    """
+    Calculates plus-polarized gravitational-wave strain based on recent values
+    of the reduced quadrupole I_bar.
+    """
+    return second_time_der(I_bar0[0,0] - I_bar0[1,1],
+                           I_bar1[0,0] - I_bar1[1,1],
+                           I_bar2[0,0] - I_bar2[1,1]) / r
 
-def integrate_RK4(phi, a, e):
+def eval_h_cross(I_bar0, I_bar1, I_bar2, r):
     """
-    Integrates the true anomaly phi, the semi-major axis a, and the
-    eccentricity e with the 4th-order Runge-Kutta method.
+    Calculates cross-polarized gravitational-wave strain based on recent values
+    of the reduced quadrupole I_bar.
     """
-    old = np.array([phi, a, e])
-    k1 = RHS(old)
-    k2 = RHS(old + 0.5 * k1)
-    k3 = RHS(old + 0.5 * k2)
-    k4 = RHS(old + k3)
-    new = old + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6.
-    return (new[0], new[1], new[2])
-
-def RHS(quants):
-    """
-    Provides a length-3 array of the righthand-sides (time-derivatives)
-    of phi, a, and e for used in integration schemes. `quants` is a length-3
-    sequence with first element phi, second element a, and third element e.
-    """
-    phi, a, e = quants[0], quants[1], quants[2]
-    r = eval_r(phi, a, e)
-    return np.array([phi_RHS(r, a, e), a_RHS(a, e), e_RHS(a, e)])
-
-def eval_r(phi, a, e):
-    """
-    Calculates the binary separation distance r.
-    From Equation 6 of the project description.
-    """
-    return a * (1 - e**2) / (1 + e * np.cos(phi))
+    return 2 * second_time_der(I_bar0[0,1], I_bar1[0,1], I_bar2[0,1]) / r
 
 def phi_RHS(r, a, e):
     """
@@ -157,71 +138,125 @@ def e_RHS(a, e):
     return ( (-304./15.) * e * (ggrav**3 * m1 * m2 * M)
              * (1 + (121./304.) * e**2) / (c**5 * a**4 * (1 - e**2)**2.5) )
 
-def wave():
+def RHS(quants):
     """
-    Function to calculate gravitational wave
+    Provides a length-3 array of the righthand-sides (time-derivatives)
+    of phi, a, and e for used in integration schemes. `quants` is a length-3
+    sequence with first element phi, second element a, and third element e.
     """
-    pass
+    phi, a, e = quants[0], quants[1], quants[2]
+    r = eval_r(phi, a, e)
+    return np.array([phi_RHS(r, a, e), a_RHS(a, e), e_RHS(a, e)])
+
+def integrate_RK4(phi, a, e):
+    """
+    Integrates the true anomaly phi, the semi-major axis a, and the
+    eccentricity e with the 4th-order Runge-Kutta method.
+    """
+    old = np.array([phi, a, e])
+    k1 = RHS(old)
+    k2 = RHS(old + 0.5 * k1)
+    k3 = RHS(old + 0.5 * k2)
+    k4 = RHS(old + k3)
+    new = old + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6.
+    return (new[0], new[1], new[2])
 
 ####################################
 # main code body
 
+start_time = time.time()
+
 pl.ion()
 
-# set up initial conditions
+subprocess.call("mkdir -p " + output_dir, shell=True)
 
-rmax = 1.1 * init_major_axis * (1 + init_eccentricity) # 1.1 * apastron
+f = open("{}/parameters.txt".format(output_dir), 'w')
+f.write("t_final = {}\nn_points = {}\n".format(t_final, n_points))
+f.close()
 
-M = m1 + m2
-mu = (m1 * m2) / M
+dt = t_final / n_points # the time-step
 
-times = np.linspace(t, t_final, num=n_points)
-dt = times[1] - times[0]
+if input_dir == None:
+    # set up initial conditions (not continuing from a checkpoint)
 
-# array of true anomaly at each time step
-phis = np.zeros(n_points)
+    subprocess.call("rm " + output_dir + "/*", shell=True)
 
-# array of semi-major axis at each time step
-axs = np.zeros(n_points)
-axs[0] = init_major_axis
+    M = m1 + m2 # total mass
+    mu = (m1 * m2) / M # reduced mass
+    t = 0 # the current time
+    phi = 0 # the true anomaly (orbital phase angle)
+    a = init_a # the semi-major axis
+    e = init_e # the eccentricity
+    x = eval_x(phi, a, e) # the binary separation vector
+    # I_bar2 is the current quadrupole, I_bar1 is what it was one time-step 
+    # ago, and I_bar0 is what it was two time-steps ago
+    I_bar0 = I_bar1 = I_bar2 = eval_I_bar(x)
+    h_plus = 0 # the plus-polarized gravitational-wave strain
+    h_cross = 0 # the cross-polarized gravitational-wave strain
 
-# array of eccentricity at each time step
-eccs = np.zeros(n_points)
-eccs[0] = init_eccentricity
+    # initial data output
+    data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
+            'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
+            'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
+    f = open("{}/iteration-{}.pickle".format(output_dir, 0), 'wb')
+    pickle.dump(data, f)
+    f.close()
 
-# array of separation vector at each time step
-xs = np.zeros((3, n_points))
-xs[:,0] = eval_x(phis[0], axs[0], eccs[0])
 
-# array of reduced quadrupole tensor at each time step
-quads = np.zeros((3, 3, n_points))
+else:
 
-# array of plus-polarized gravitational wave strain at each time step
-hpluses = np.zeros(n_points)
+    f = open("{}/iteration-{}.pickle".format(input_dir,start_iteration-1),'rb')
+    data = pickle.load(f)
+    f.close()
+    
+    t, phi, a, e, x = data['t'], data['phi'], data['a'], data['e'], data['x']
+    h_plus, h_cross = data['h_plus'], data['h_cross']
+    try:
+        I_bar0, I_bar1, I_bar2 = data['I_bar0'], data['I_bar1'], data['I_bar2']
+    except KeyError: # backwards compatibility with old format of output data
+        I_bar0 = I_bar1 = I_bar2 = data['I_bar']
+    try:
+        m1, m2 = data['m1'], data['m2']
+    except KeyError:
+        pass # use the parameter values defined in this file
+    M = m1 + m2 # total mass
+    mu = (m1 * m2) / M # reduced mass
 
-# array of cross-polarized gravitational wave strain at each time step
-hcrosses = np.zeros(n_points)
 
+rmax = 1.1 * a * (1 + e) # 1.1 * apastron
 
 # main loop 
 
-for it, t in enumerate(times[:-1]):
+for it in range(int(start_iteration), int(n_points)):
 
+    # Time stamp
+
+    if it % 100 == 0:
+        elapsed = time.time() - start_time
+        print "Iteration {}/{:.0f} -- Time elapsed: {:.0f} seconds ({:.1f} minutes) ({:.2f} hours)".format(it, n_points, elapsed,
+                                            elapsed / 60, elapsed / 3600)
+ 
     # Update quantities
     
-    phis[it+1], axs[it+1], eccs[it+1] = integrate_RK4(phis[it], axs[it], eccs[it])
-    xs[:,it+1] = eval_x(phis[it+1], axs[it+1], eccs[it+1])
-    quads[:,:,it+1] = eval_quad(xs[:,it+1])
-    
-    r = np.linalg.norm(xs[:,it+1])
-    hpluses[it+1] = second_time_der(quads[0,0,:] - quads[1,1,:], it+1) / r
-    hcrosses[it+1] = 2 * second_time_der(quads[0,1,:], it+1) / r
-    
-    pos = np.zeros((2, 3))
-    pos[0,:] =  (m2 / M) * xs[:,it+1]
-    pos[1,:] = -(m1 / M) * xs[:,it+1]
+    t += dt
 
-    # Plot stuff
+    phi, a, e = integrate_RK4(phi, a, e)
+
+    x = eval_x(phi, a, e)
+    r = np.linalg.norm(x)
+
+    I_bar0 = I_bar1
+    I_bar1 = I_bar2
+    I_bar2 = eval_I_bar(x)
+
+    h_plus = eval_h_plus(I_bar0, I_bar1, I_bar2, r)
+    h_cross = eval_h_cross(I_bar0, I_bar1, I_bar2, r)
+
+    # Plot positions of binary stars
+
+    pos = np.zeros((2, 3))
+    pos[0,:] =  (m2 / M) * x
+    pos[1,:] = -(m1 / M) * x
     
     pl.clf()
     fig = pl.gcf()
@@ -232,7 +267,14 @@ for it, t in enumerate(times[:-1]):
     ax.set_zlim((-rmax,rmax))
     pl.draw()
 
-    if eval_r(phis[it+1], axs[it+1], eccs[it+1]) < min_separation:
-        break
+    # Output data
+
+    data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
+            'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
+            'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
+    f = open("{}/iteration-{}.pickle".format(output_dir, it), 'wb')
+    pickle.dump(data, f)
+    f.close()
 
 pl.show()
+
