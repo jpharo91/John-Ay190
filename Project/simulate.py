@@ -33,11 +33,14 @@ hulse_taylor_a = 0.5 * (hulse_taylor_periastron + hulse_taylor_apastron)
 hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
 # parameters (CGS units)
-input_dir = "output" # if none, a new simulation will be created
-start_iteration = 440279+1 # needs to be 0 if the above is `None`
-output_dir = "output" # name of directory to place output data in
-t_final = 1e9 # final time
-n_points = 1e6 # should be at least one point per 1000 s of simulated time
+movie = False # do we show a realtime movie of the system? much faster if False
+input_dir = "billion" # if None, a new simulation will be created
+start_iteration = 999000+1 # needs to be 0 if the above is `None`
+output_dir = "billion" # name of directory to place output data in
+t_final = 2e9 * (np.pi * 1e7) # final time
+n_points = 2e6 # should be at least one point per 1000 s of simulated time
+               # for phi evolution to be valid
+output_every = 1000
 init_a = hulse_taylor_a
 init_e = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
@@ -231,10 +234,12 @@ for it in range(int(start_iteration), int(n_points)):
 
     # Time stamp
 
-    if it % 100 == 0:
+    if it % (10 * output_every) == 0:
         elapsed = time.time() - start_time
-        print "Iteration {}/{:.0f} -- Time elapsed: {:.0f} seconds ({:.1f} minutes) ({:.2f} hours)".format(it, n_points, elapsed,
-                                            elapsed / 60, elapsed / 3600)
+        print "Iteration {}/{:.0f} ({}%) -- Time elapsed: {:.0f} seconds ({:.1f} minutes) ({:.2f} hours)".format(it, n_points,
+                                                    it * 100. / n_points,
+                                                    elapsed, elapsed / 60,
+                                                            elapsed / 3600)
  
     # Update quantities
     
@@ -252,29 +257,32 @@ for it in range(int(start_iteration), int(n_points)):
     h_plus = eval_h_plus(I_bar0, I_bar1, I_bar2, r)
     h_cross = eval_h_cross(I_bar0, I_bar1, I_bar2, r)
 
+    if movie:
     # Plot positions of binary stars
 
-    pos = np.zeros((2, 3))
-    pos[0,:] =  (m2 / M) * x
-    pos[1,:] = -(m1 / M) * x
+        pos = np.zeros((2, 3))
+        pos[0,:] =  (m2 / M) * x
+        pos[1,:] = -(m1 / M) * x
     
-    pl.clf()
-    fig = pl.gcf()
-    ax = mpl3d.Axes3D(fig)
-    ax.scatter(pos[:,0], pos[:,1], pos[:,2])
-    ax.set_xlim((-rmax,rmax))
-    ax.set_ylim((-rmax,rmax))
-    ax.set_zlim((-rmax,rmax))
-    pl.draw()
+        pl.clf()
+        fig = pl.gcf()
+        ax = mpl3d.Axes3D(fig)
+        ax.scatter(pos[:,0], pos[:,1], pos[:,2])
+        ax.set_xlim((-rmax,rmax))
+        ax.set_ylim((-rmax,rmax))
+        ax.set_zlim((-rmax,rmax))
+        pl.draw()
 
+    if it % output_every == 0:
     # Output data
 
-    data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
-            'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
-            'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
-    f = open("{}/iteration-{}.pickle".format(output_dir, it), 'wb')
-    pickle.dump(data, f)
-    f.close()
+        data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
+                'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
+                'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
+        f = open("{}/iteration-{}.pickle".format(output_dir, it), 'wb')
+        pickle.dump(data, f)
+        f.close()
 
-pl.show()
+if movie:
+    pl.show()
 
