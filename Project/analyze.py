@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as pl
 import cPickle as pickle
 import subprocess
+import plot_defaults
 
 
 ####################################
@@ -96,7 +97,12 @@ Es = 0.5 * (ggrav * M / Ls)**2 * (eccs**2 - 1)
 fig_dir = output_dir + "_figs"
 subprocess.call("mkdir -p " + fig_dir, shell=True)
 
-pl.figure()
+fig = pl.figure(figsize=(10,8))
+fig.subplots_adjust(left=0.2)
+fig.subplots_adjust(bottom=0.16)
+fig.subplots_adjust(top=0.85)
+fig.subplots_adjust(right=0.85)
+
 pl.plot(times, axs, lw=8)
 pl.savefig(fig_dir + "/semi-major_axis.pdf")
 
