@@ -109,8 +109,10 @@ pl.ylabel("Semi-major axis (cm)")
 pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 pl.savefig(fig_dir + "/semi-major_axis.pdf")
 
+red_eccs = eccs * 10**10
+
 pl.clf()
-pl.plot(times, eccs, lw=8)
+pl.plot(times, red_eccs, lw=8)
 pl.xlabel("Time (s)")
 pl.ylabel("Eccentricity")
 pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
@@ -123,7 +125,7 @@ pl.ylabel("Energy (ergs)")
 pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 pl.savefig(fig_dir + "/energy.pdf")
 
-red_Ls = Ls / 10**8
+red_Ls = Ls / 10**7
 
 pl.clf()
 pl.plot(times, red_Ls, lw=8)

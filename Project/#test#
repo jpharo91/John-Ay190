@@ -1,0 +1,4 @@
+npoints = 10000
+t = 0.0
+t_final = 100.0
+times = np.linspace(t, t_final, num=npoints)
