@@ -120,6 +120,53 @@ Upon completing the simulation code, we first ran a test simulation using the pa
 \label{fig:simpleplot2}
 \end{figure}
 
+\subsection{Inspiral Analysis}
+
+Having established the correctness of our simulation code by testing the Hulse-Taylor system, we next moved on to applying the simulation to the study of gravitational waves. The wave strains are most usefuly observed near the end of the system inspiral, so the next step was to apply the simulation to the final seconds prior to the system reaching the ``solution'' of $a(t)$. Fortunately, near the end of the inspiral, it is safe to assume that $e=0$, so the final semi-major axis may be found. Having done this, the simulation was then focused on the final few hundred seconds of the inspiral. \\
+
+In Figure 5, one can see a comparison of the numerical result of our simulation of the final inspiral as compared to the analytic result (possible due to the assumption that $e=0$ in this range). This shows a high degree of accuracy of the simulation's results for the semi-major axis, so we may proceed, confident in out procedure, to analyzing the wave strain results. \\
+
+Figures 6 and 7 show the wave strains plotted as a function of time, with Figure 7 showing a much narrower time domain. In this case, the actual waveforms of the strains can be seen. Figure 8 shows how the frequency of the gravitational waves change with time, and the frequency spectrum can be seen in Figure 9.
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{inspiral_figs/inspiral_axs.pdf}
+\caption{This is the plot of the semi-major axis as a function of time, leading up to the analytic solution for $a(t)$, assuming that the eccentricity is 0.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{inspiral_figs/inspiral_strains1.pdf}
+\caption{This is the plot of inspiral gravitational wave strains as a function of time, leading up to the analytic solution.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{inspiral_figs/inspiral_strains2.pdf}
+\caption{This is another plot of the inspiral gravitational wave strains as a function of time, except on a shorter timescale, such that the waveforms of the strains are visible.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{inspiral_figs/inspiral_freqs.pdf}
+\caption{This is the plot of the gravitational wave frequency as a function of time in the time leading up to the conclusion of the inspiral.}
+\label{fig:simpleplot2}
+\end{figure}
+
+\begin{figure}[bth]
+\centering
+\includegraphics[width=0.5\textwidth]{inspiral_figs/inspiral_strain_spectrum.pdf}
+\caption{This is the plot of the frequency spectrum of the gravitational wave strain.}
+\label{fig:simpleplot2}
+\end{figure}
+
 \section{Conclusion}
+
+Using the results of Peters 1964, one can find expressions for the rates of change of the semi-major axis and eccentricity for a system of compact binaries with respect to time. By applying these results in a simulation using a Runge-Kutta 4 integration scheme, we are able to accurately recreated the predicted inspirals of such a binary system. \\
+
+Having developed an accurate means for determining the orbits of a binary system, the simulation can then be applied to studying the gravitational wave emission of an inspiralling binary. By setting the eccentricity to 0 (valid near the end of the inspiral), the final regime of the inspiral can be studied in detail, producing accurate descriptions of the gravitational wave emissions.
 
 \end{document}
