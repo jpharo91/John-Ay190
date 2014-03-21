@@ -37,16 +37,16 @@ movie = False # do we show a realtime movie of the system? much faster if False
 movie_every = 10
 output_every = 1000
 timestamp_every = 10000
-start_iteration = 19999000+1 # needs to be 0 if `input_dir` is `None`
-input_dir = "inspiral2" # if None, a new simulation will be created
-output_dir = "inspiral3" # name of directory to place output data in
+start_iteration = 0 # needs to be 0 if `input_dir` is `None`
+input_dir = None # if None, a new simulation will be created
+output_dir = "orbit" # name of directory to place output data in
 kill_back_rxn = False # if False a and e will not be evolved
 
-t_simulate = 8.5e-05 # total time to simulate
+t_simulate = 7.2e4 # total time to simulate
 n_points = 1e7 # should be at least one point per 1000 s of simulated time
                # for phi evolution to be valid
-init_a = 0.
-init_e = 0.
+init_a = hulse_taylor_a
+init_e = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
 m2 = 1.4*msun # mass of body 2
 
@@ -58,8 +58,7 @@ if input_dir == None and start_iteration != 0:
 
 def kron(i, j):
     """
-    Computes the Kronecker delta of `i` and `j`; that is,
-    returns 1 if `i` == `j` and 0 otherwise.
+    Computes the Kronecker delta of `i` and `j`.
     """
     if i == j:
         return 1
