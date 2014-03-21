@@ -34,15 +34,19 @@ hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
 # parameters (CGS units)
 movie = False # do we show a realtime movie of the system? much faster if False
-input_dir = "billion" # if None, a new simulation will be created
-start_iteration = 999000+1 # needs to be 0 if the above is `None`
-output_dir = "billion" # name of directory to place output data in
-t_final = 2e9 * (np.pi * 1e7) # final time
-n_points = 2e6 # should be at least one point per 1000 s of simulated time
-               # for phi evolution to be valid
+movie_every = 10
 output_every = 1000
-init_a = hulse_taylor_a
-init_e = hulse_taylor_e
+timestamp_every = 10000
+start_iteration = 19999000+1 # needs to be 0 if `input_dir` is `None`
+input_dir = "inspiral2" # if None, a new simulation will be created
+output_dir = "inspiral3" # name of directory to place output data in
+kill_back_rxn = False # if False a and e will not be evolved
+
+t_simulate = 8.5e-05 # total time to simulate
+n_points = 1e7 # should be at least one point per 1000 s of simulated time
+               # for phi evolution to be valid
+init_a = 0.
+init_e = 0.
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
 m2 = 1.4*msun # mass of body 2
 
@@ -144,7 +148,7 @@ def e_RHS(a, e):
 def RHS(quants):
     """
     Provides a length-3 array of the righthand-sides (time-derivatives)
-    of phi, a, and e for used in integration schemes. `quants` is a length-3
+    of phi, a, and e for use in integration schemes. `quants` is a length-3
     sequence with first element phi, second element a, and third element e.
     """
     phi, a, e = quants[0], quants[1], quants[2]
@@ -153,8 +157,10 @@ def RHS(quants):
 
 def integrate_RK4(phi, a, e):
     """
-    Integrates the true anomaly phi, the semi-major axis a, and the
-    eccentricity e with the 4th-order Runge-Kutta method.
+    Integrates the true anomaly `phi`, the semi-major axis `a`, and the
+    eccentricity `e` over one time step with the 4th-order Runge-Kutta method. 
+    If the kill_back_rxn parameter is set to True, then `a` and `e` are not
+    integrated.
     """
     old = np.array([phi, a, e])
     k1 = RHS(old)
@@ -162,6 +168,8 @@ def integrate_RK4(phi, a, e):
     k3 = RHS(old + 0.5 * k2)
     k4 = RHS(old + k3)
     new = old + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6.
+    if kill_back_rxn:
+        new[1:] = old[1:] # set a and e to their old values
     return (new[0], new[1], new[2])
 
 ####################################
@@ -171,18 +179,16 @@ start_time = time.time()
 
 pl.ion()
 
-subprocess.call("mkdir -p " + output_dir, shell=True)
+if output_dir != None:
 
-f = open("{}/parameters.txt".format(output_dir), 'w')
-f.write("t_final = {}\nn_points = {}\n".format(t_final, n_points))
-f.close()
+    subprocess.call("mkdir -p " + output_dir, shell=True)
 
-dt = t_final / n_points # the time-step
+    f = open("{}/parameters.txt".format(output_dir), 'w')
+    f.write("t_simulate = {}\nn_points = {}".format(t_simulate, n_points))
+    f.close()
 
 if input_dir == None:
     # set up initial conditions (not continuing from a checkpoint)
-
-    subprocess.call("rm " + output_dir + "/*", shell=True)
 
     M = m1 + m2 # total mass
     mu = (m1 * m2) / M # reduced mass
@@ -197,13 +203,15 @@ if input_dir == None:
     h_plus = 0 # the plus-polarized gravitational-wave strain
     h_cross = 0 # the cross-polarized gravitational-wave strain
 
-    # initial data output
-    data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
-            'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
-            'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
-    f = open("{}/iteration-{}.pickle".format(output_dir, 0), 'wb')
-    pickle.dump(data, f)
-    f.close()
+
+    if output_dir != None:
+        # initial data output
+        data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
+                'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
+                'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
+        f = open("{}/iteration-{}.pickle".format(output_dir, 0), 'wb')
+        pickle.dump(data, f)
+        f.close()
 
 
 else:
@@ -225,27 +233,30 @@ else:
     M = m1 + m2 # total mass
     mu = (m1 * m2) / M # reduced mass
 
-
+dt = t_simulate / n_points # the time-step
 rmax = 1.1 * a * (1 + e) # 1.1 * apastron
+final_iteration = start_iteration + n_points
 
 # main loop 
 
-for it in range(int(start_iteration), int(n_points)):
+for it in range(int(start_iteration), int(final_iteration)):
 
     # Time stamp
 
-    if it % (10 * output_every) == 0:
+    if it % timestamp_every == 0:
         elapsed = time.time() - start_time
-        print "Iteration {}/{:.0f} ({}%) -- Time elapsed: {:.0f} seconds ({:.1f} minutes) ({:.2f} hours)".format(it, n_points,
-                                                    it * 100. / n_points,
-                                                    elapsed, elapsed / 60,
-                                                            elapsed / 3600)
+        print "Iteration {}/{:.0f} -- {}% -- t: {} -- a: {} -- Time elapsed: {:.0f} seconds ({:.1f} minutes) ({:.2f} hours)".format(
+                                                    it, final_iteration,
+                                                    (it-start_iteration)*100. / n_points,
+                                                    t, a, elapsed, elapsed/60,
+                                                            elapsed/3600)
  
     # Update quantities
     
     t += dt
 
     phi, a, e = integrate_RK4(phi, a, e)
+    phi %= 2 * np.pi # keeps phi in [0, 2*pi)
 
     x = eval_x(phi, a, e)
     r = np.linalg.norm(x)
@@ -257,7 +268,8 @@ for it in range(int(start_iteration), int(n_points)):
     h_plus = eval_h_plus(I_bar0, I_bar1, I_bar2, r)
     h_cross = eval_h_cross(I_bar0, I_bar1, I_bar2, r)
 
-    if movie:
+
+    if movie and it % movie_every == 0:
     # Plot positions of binary stars
 
         pos = np.zeros((2, 3))
@@ -273,9 +285,10 @@ for it in range(int(start_iteration), int(n_points)):
         ax.set_zlim((-rmax,rmax))
         pl.draw()
 
-    if it % output_every == 0:
-    # Output data
 
+    if output_dir != None and it % output_every == 0:
+
+        # Output data
         data = {'t':t, 'phi':phi, 'a':a, 'e':e, 'x':x,
                 'I_bar0':I_bar0, 'I_bar1':I_bar1, 'I_bar2':I_bar2,
                 'h_plus':h_plus, 'h_cross':h_cross, 'm1':m1, 'm2':m2}
@@ -286,3 +299,4 @@ for it in range(int(start_iteration), int(n_points)):
 if movie:
     pl.show()
 
+print "Done\a\a\a\a\a" # make noise when we're done
