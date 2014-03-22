@@ -16,7 +16,7 @@ import plot_defaults
 
 
 ####################################
-# General Constants (CGS units)
+### General Constants (CGS units) ###
 ggrav = 6.67e-8
 c = 3.0e10
 msun = 1.99e33
@@ -24,7 +24,7 @@ rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 
 ####################################
-# Settings and Parameters
+### Settings and Parameters ###
 
 output_dir = "example" # name of directory containing simulation output data
 start_iteration = 0 # the first iteration to load
@@ -104,7 +104,7 @@ fig.subplots_adjust(top=0.85)
 fig.subplots_adjust(right=0.85)
 
 pl.clf()
-pl.plot(times, np.linalg.norm(xs, axis=0), lw=8)
+pl.plot(times, np.apply_along_axis(np.linalg.norm, 0, xs), lw=8)
 pl.xlabel(r"Time \(t\) [s]")
 pl.ylabel(r"Radius \(r\) [cm]")
 pl.xlim(times[0], times[-1])
