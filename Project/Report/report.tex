@@ -119,7 +119,7 @@ Finally, the code generates plots of various quantities and saves them to a plot
 
 \subsection{Present-Day Hulse-Taylor Binary}
 
-Upon completing the simulation code, we first simulated the present-day PSR B1913+16 binary system, also known as the Hulse-Taylor binary, a system of two orbiting neutron stars of approximately \(1.4 M_\odot\) each. We evolved the system for \(7.2 \times 10^e\) s, or 20 hours. The orbital radius and true anomaly are plotted over the course of the simulation in Figures~\ref{orbit-radius}~and~\ref{orbit-phi}, respectively. The two polarizations of the gravitational wave strain are plotted versus time in Figure~\ref{orbit-strain}. Because we evolved the simulation for such a short time, \(a\), \(e\), and consequently E and L barely change, so their plots are omitted.
+Upon completing the simulation code, we first simulated the present-day PSR B1913+16 binary system, also known as the Hulse-Taylor binary, a system of two orbiting neutron stars of approximately \(1.4 M_\odot\) each. We evolved the system for \(7.2 \times 10^{4}\)~s, or 20 hours. The orbital radius and true anomaly are plotted over the course of the simulation in Figures~\ref{orbit-radius}~and~\ref{orbit-phi}, respectively. The two polarizations of the gravitational wave strain are plotted versus time in Figure~\ref{orbit-strain}. Because we evolved the simulation for such a short time, \(a\), \(e\), and consequently E and L barely change, so their plots are omitted.
 
 \begin{figure}[H]
 \vspace{-0.24cm}
@@ -146,13 +146,13 @@ Upon completing the simulation code, we first simulated the present-day PSR B191
 
 \subsection{Evolution of Hulse-Taylor Binary}
 
-To investigate how \(a\) and \(e\) evolve in the Hulse-Taylor binary due to gravitational-wave emission, we simulated the binary one billion years into the future. Due to limitations of computing power, the time-step size was 1000 years, during which there are approximately 1 million orbits, or 1 million oscillations of \(r\) and \(\phi\). Therefore the integration of \(\phi\) will be completely wrong, but since \(a\) and \(e\) are independent of \(\phi\) and \(r\), our computation of their evolution can still be correct. The results for \(a\), \(e\), and thereby \(L\) and \(E\) are plotted in Figures~\ref{billion-axis}, \ref{billion-ecc}, \ref{billion-momentum}, and \ref{billion-energy}, respectively.
+To investigate how \(a\) and \(e\) evolve in the Hulse-Taylor binary due to gravitational-wave emission, we simulated the binary one billion years into the future. Due to limitations of computing power, the time-step size was 1000 years, during which there are approximately 1 million orbits, or 1 million oscillations of \(r\) and \(\phi\). Therefore the integration of \(\phi\) will be completely wrong, but since \(a\) and \(e\) are independent of \(\phi\) and \(r\), our computation of their evolution is still valid. The results for \(a\), \(e\), and thereby \(L\) and \(E\) are plotted in Figures~\ref{billion-axis}, \ref{billion-ecc}, \ref{billion-momentum}, and \ref{billion-energy}, respectively.
 
 \begin{figure}[t!]
 \vspace{-0.24cm}
 \centering
 \hspace*{-1cm}\includegraphics[width=1.2\textwidth]{billion_figs/semi-major-axis.pdf}
-\caption{The semi-major axis of the Hulse-Taylor binary over the course of \(\sim\) 300 million years. The orbital separation decreases over time due to gravitational radiation. The simulation stopped was terminated at \(1.12 \times 10^{16}\) seconds \(\sim\) 357 million years when the semi-major axis reached zero, indicating that the binary had coalesced.}
+\caption{The semi-major axis of the Hulse-Taylor binary over the course of \(\sim\) 300 million years. The orbital separation decreases over time due to gravitational radiation. The simulation was terminated at \(1.12 \times 10^{16}\) seconds \(\sim\) 357 million years when the semi-major axis reached zero, indicating that the binary had coalesced.}
 \label{billion-axis}
 \end{figure}
 
