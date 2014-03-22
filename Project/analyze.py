@@ -26,10 +26,10 @@ direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 ####################################
 # Parameters
 
-output_dir = "output4" # name of directory containing simulation output data
+output_dir = "example" # name of directory containing simulation output data
 start_iteration = 0 # the first iteration to load
-n_points = 10**5 # number of iterations in the simulation
-input_every = 1000 # inputs one data file for every `input_every` data files
+n_points = 1e2 # number of iterations in the simulation
+input_every = 1 # inputs one data file for every `input_every` data files
 m1 = 1.4*msun # mass of body 1
 m2 = 1.4*msun # mass of body 2
 
@@ -62,7 +62,7 @@ h_pluses = np.zeros(n_loaded)
 # array of cross-polarized gravitational wave strain at each time step
 h_crosses = np.zeros(n_loaded)
 
-for it in range(n_loaded):
+for it in range(int(n_loaded)):
     f = open("{}/iteration-{}.pickle".format(output_dir, start_iteration + it*input_every), 'rb')
     data = pickle.load(f)
     f.close()
@@ -103,32 +103,53 @@ fig.subplots_adjust(bottom=0.16)
 fig.subplots_adjust(top=0.85)
 fig.subplots_adjust(right=0.85)
 
+pl.clf()
+pl.plot(times, np.linalg.norm(xs, axis=0), lw=8)
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Radius \(r\) [cm]")
+pl.xlim(times[0], times[-1])
+pl.savefig(fig_dir + "/radius.pdf")
+
+pl.clf()
+pl.plot(times, phis, lw=8)
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"True anomaly \(\phi\) [radians]")
+pl.xlim(times[0], times[-1])
+pl.savefig(fig_dir + "/true-anomaly.pdf")
+
+pl.clf()
+h_plus, = pl.plot(times[1:], h_pluses[1:] * ggrav / c**4, lw=8)
+h_cross, = pl.plot(times[1:], h_crosses[1:] * ggrav / c**4, 'r', lw=8)
+pl.legend( (h_plus, h_cross), (r"$h_+$", r"$h_{\times}$"), frameon=False, loc="lower left")
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Gravitational Wave Strain")
+pl.xlim(times[0], times[-1])
+pl.savefig(fig_dir + "/gw-strain.pdf")
+
+pl.clf()
 pl.plot(times, axs, lw=8)
-pl.xlabel("Time (s)")
-pl.ylabel("Semi-major axis (cm)")
-pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
-pl.savefig(fig_dir + "/semi-major_axis.pdf")
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Semi-major axis \(a\) [cm]")
+pl.xlim(times[0], times[-1])
+pl.savefig(fig_dir + "/semi-major-axis.pdf")
 
 pl.clf()
 pl.plot(times, eccs, lw=8)
-pl.xlabel("Time (s)")
-pl.ylabel("Eccentricity")
-pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Eccentricity \(e\)")
+pl.xlim(times[0], times[-1])
 pl.savefig(fig_dir + "/eccentricity.pdf")
 
 pl.clf()
 pl.plot(times, Es, lw=8)
-pl.xlabel("Time (s)")
-pl.ylabel("Energy (ergs)")
-pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Energy \(E\) [erg]")
+pl.xlim(times[0], times[-1])
 pl.savefig(fig_dir + "/energy.pdf")
 
-red_Ls = Ls / 10**8
-
 pl.clf()
-pl.plot(times, red_Ls, lw=8)
-pl.xlabel("Time (s)")
-pl.ylabel("Angular momentum (erg*s)")
-pl.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
-pl.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
-pl.savefig(fig_dir + "/angular_momentum.pdf")
+pl.plot(times, Ls, lw=8)
+pl.xlabel(r"Time \(t\) [s]")
+pl.ylabel(r"Angular momentum \(L_z\) [erg \(\cdot\) s]")
+pl.xlim(times[0], times[-1])
+pl.savefig(fig_dir + "/angular-momentum.pdf")

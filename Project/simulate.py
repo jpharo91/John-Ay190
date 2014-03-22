@@ -17,41 +17,37 @@ import time
 import subprocess
 
 ####################################
-# Constants and Parameters
 
-# general constants (CGS units)
+### General Constants and Initial Data (CGS units) ###
 ggrav = 6.67e-8
 c = 3.0e10
 msun = 1.99e33
 rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
-
 # initial data for Hulse-Taylor binary
 hulse_taylor_periastron = 1.1 * rsun
 hulse_taylor_apastron = 4.8 * rsun
 hulse_taylor_a = 0.5 * (hulse_taylor_periastron + hulse_taylor_apastron)
 hulse_taylor_e = 1 - 2 / (hulse_taylor_apastron / hulse_taylor_periastron + 1)
 
-# parameters (CGS units)
-movie = False # do we show a realtime movie of the system? much faster if False
-movie_every = 10
-output_every = 1000
-timestamp_every = 10000
-start_iteration = 0 # needs to be 0 if `input_dir` is `None`
+### Settings ###
+movie = True # do we show a realtime movie of the system? much faster if False
+movie_every = 1
+output_every = 1
+timestamp_every = 10
 input_dir = None # if None, a new simulation will be created
-output_dir = "orbit" # name of directory to place output data in
-kill_back_rxn = False # if False a and e will not be evolved
-
-t_simulate = 7.2e4 # total time to simulate
-n_points = 1e7 # should be at least one point per 1000 s of simulated time
+output_dir = "example" # name of directory to place output data in
+kill_back_rxn = False # if True a and e will not be evolved
+n_points = 1e2 # should be at least one point per 1000 s of simulated time
                # for phi evolution to be valid
+start_iteration = 0 # needs to be 0 if `input_dir` is `None`
+
+### Parameters (CGS units) ###
+t_simulate = 1e5 # total time to simulate
 init_a = hulse_taylor_a
 init_e = hulse_taylor_e
 m1 = 1.4*msun # mass of body 1 (1.4 for typical neutron star)
 m2 = 1.4*msun # mass of body 2
-
-if input_dir == None and start_iteration != 0:
-    raise ValueError("If input_dir is None, then start_iteration must be 0")
 
 ####################################
 # Helper Functions
@@ -174,6 +170,9 @@ def integrate_RK4(phi, a, e):
 ####################################
 # main code body
 
+if input_dir == None and start_iteration != 0:
+    raise ValueError("If input_dir is None, then start_iteration must be 0")
+
 start_time = time.time()
 
 pl.ion()
@@ -182,8 +181,19 @@ if output_dir != None:
 
     subprocess.call("mkdir -p " + output_dir, shell=True)
 
+    parameter_string = """t_simulate = {}
+start_iteration = {}
+n_points = {}
+output_every = {}
+kill_back_rxn = {}
+init_a = {}
+init_e = {}
+m1 = {}
+m2 = {}""".format(t_simulate, start_iteration, n_points, output_every,
+                  kill_back_rxn, init_a, init_e, m1, m2)
+
     f = open("{}/parameters.txt".format(output_dir), 'w')
-    f.write("t_simulate = {}\nn_points = {}".format(t_simulate, n_points))
+    f.write(parameter_string)
     f.close()
 
 if input_dir == None:
