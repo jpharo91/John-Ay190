@@ -24,7 +24,7 @@ rsun = 6.96e10
 direcs = [0, 1, 2] # indices corresponding to the three spatial directions
 
 ####################################
-# Parameters
+# Settings and Parameters
 
 output_dir = "example" # name of directory containing simulation output data
 start_iteration = 0 # the first iteration to load
