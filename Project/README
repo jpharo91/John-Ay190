@@ -1,0 +1,77 @@
+John Pharo and Cutter Coryell
+Ay 190 Final Project README
+
+PURPOSE:
+
+The program `simulate.py` simulates the evolution of a compact binary stellar system
+over a specified time scale, including its decay due to gravitational wave radiation.
+
+The program `analyze.py` produces plots of various quantities from the output of
+`simulate.py`, including plots of orbital radius, true anomaly, semi-major axis,
+eccentricity, angular momentum, energy, and gravitational-wave strain versus time.
+
+USAGE (simulate.py):
+
+`simulate.py` can be run from the command line like " ./simulate.py ". It is already
+configured to simulate the Hulse-Taylor binary from its present-day state for 10^5
+seconds, with data output to the directory `example/` which will be created when run.
+Simulation settings that can be varied are found in the "### Settings ###" section of
+`simulate.py` and are:
+
+movie : Boolean -- Do we display a 3-D movie of the simulation as it progresses?
+movie_every : Integer -- Update the movie every `movie_every` iterations of the simulation
+output_every : Integer -- Output the simulation state every `output_every` iterations
+timestamp_every : Integer -- Print a time stamp containing simulation statistics
+                             every `timestamp_every` iterations
+input_dir : String -- If this simulation is continuing where another left off, this is
+                      the path to the output directory containing that simulation's data.
+                      If not continuing, this should be None (not a string literal).
+output_dir : String -- If the simulation is outputting data for use in `analyze.py` or
+                       for use as input to a future simulation, this is the name of
+                       the directory to output the data in. This directory will be created
+                       if it does not already exist. If no output is desired, this should
+                       be None (not a string literal).
+kill_back_rxn : Boolean -- If this is True, the back-reaction (gravitational-wave
+                           emission altering the orbit) will be turned off, so the
+                           semi-major axis and eccentricity will not change. If False,
+                           the orbit will be effected by gravitational-wave emission.
+n_points : Integer -- The number of time steps in the simulation. This should be at least
+                      t_simulate / 1000 to ensure reasonable accuracy of the orbit
+                      evolution given by the true anomaly phi (though the orbit shape
+                      given by the semi-major axis a and the eccentricity e can remain
+                      accurate even at lower numbers of time steps).
+start_iteration : Integer -- The iteration to begin the simulation on, for purposes of
+                             continuing previous simulations. Must be 1 more than the
+                             last iteration number of the previous simulation. If not
+                             continuing from a previous simulation, this must be 0.
+t_simulate : Float -- The amount of simulated time in seconds to evolve the system for.
+init_a : Float -- The initial semi-major axis of the system in centimeters. Default is
+                  set to the semi-major axis of the Hulse-Taylor binary,
+                  2.1 * 10^11 cm.
+init_e : Float -- The initial eccentricity of the system. Default is set to the
+                  eccentricity of the Hulse-Taylor binary, 0.63.
+m1 : Float -- The mass in grams of the first object in the binary. By default this is set
+              to a typical neutron star mass of 1.4 solar masses.
+m2 : Float -- The mass in grams of the second object in the binary. By default this is set
+              to a typical neutron star mass of 1.4 solar masses.
+              
+USAGE (analyze.py):
+
+`analyze.py` can be run from the command line like " ./analyze.py ". It is already
+configured to plot various quantities using the output of the default simulation of
+`simulate.py`. These plots will be generated in the folder (created if necessary)
+`<output_dir>_figs/`, where <output_dir> is the name of the directory containing
+the output of the simulation that is being analyzed. Settings and parameters that are
+configurable are found in the "### Settings and Parameters ###" section of `analyze.py`
+and are:
+
+output_dir : String -- The directory containing the output of the simulation that is to
+                       be analyzed. Figures will be put in the directory
+                       `<output_dir>_figs/` which will be created if it does not exist.
+start_iteration : Integer -- The simulation iteration with which to begin analysis.
+n_points : Integer -- The number of simulation iterations to analyze.
+input_every : Integer -- Only analyze every `input_every` iterations (this must be
+                         an integer multiple of the `output_every` parameter in
+                         `simulate.py`.
+m1 : Float -- The mass in grams of the first object in the binary.
+m2 : Float -- The mass in grams of the second object in the binary.
